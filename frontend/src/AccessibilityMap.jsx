@@ -1,10 +1,10 @@
 import { useEffect, useRef, useState, useMemo, useCallback } from 'react'
-import { MapContainer, TileLayer, Marker, Popup, useMap, useMapEvents } from 'react-leaflet'
+import { MapContainer, TileLayer, Marker, Popup, Tooltip, useMap, useMapEvents } from 'react-leaflet'
 import { sanity } from './sanityClient'
 import Breadcrumb from './Breadcrumb'
 import { useLanguage } from './languageContext'
 import { pickI18n } from './i18nUtils'
-import { t } from './uiStrings'
+import { t, tFormat } from './uiStrings'
 import { Link, useSearchParams } from 'react-router-dom'
 import 'leaflet/dist/leaflet.css'
 import './AccessibilityMap.css'
@@ -826,6 +826,19 @@ function AccessibilityMap() {
         <Link to="/" className="back-link">{t(lang, 'pages.accessibilityMap.backHome')}</Link>
         <h1>{t(lang, 'pages.accessibilityMap.title')}</h1>
         <p className="subtitle">{t(lang, 'pages.accessibilityMap.subtitle')}</p>
+        <div className="map-marker-guide" aria-label={t(lang, 'pages.accessibilityMap.markerGuideAria')}>
+          <p>
+            <span className="map-marker-guide-dot map-marker-guide-dot--resource" aria-hidden="true" />
+            {t(lang, 'pages.accessibilityMap.resourceMarkerLegend')}
+          </p>
+          <p>
+            <span className="map-marker-guide-dot map-marker-guide-dot--report" aria-hidden="true" />
+            {t(lang, 'pages.accessibilityMap.reportMarkerLegend')}
+          </p>
+          <p className="map-marker-guide-help">
+            {t(lang, 'pages.accessibilityMap.markerInteractionHelp')}
+          </p>
+        </div>
       </header>
 
       {loading ? (
@@ -1102,23 +1115,37 @@ function AccessibilityMap() {
                     const pos = normalizeCoordinates(report.coordinates)
                     if (!pos) return null
                     const isSelected = selectedReportMarker?._id === report._id
+                    const selectReport = () => {
+                      markerClickedRef.current = true
+                      setSelectedReportMarker(report)
+                      setSelectedMapResource(null)
+                      setSearchQuery(report.subject)
+                      setIsTyping(false)
+                      setIsPanelOpen(true)
+                    }
                     return (
                       <Marker
                         key={`report-${report._id}`}
                         position={pos}
                         icon={isSelected ? reportIconSelected : reportIcon}
+                        keyboard
+                        title={t(lang, 'pages.accessibilityMap.reportMarkerTooltip')}
                         eventHandlers={{
-                          click: () => {
-                                markerClickedRef.current = true
-                                setSelectedReportMarker(report)
-                                setSelectedMapResource(null)
-                                // show report subject in search bar but don't show suggestions
-                                setSearchQuery(report.subject)
-                                setIsTyping(false)
-                                setIsPanelOpen(true)
+                          focus: (event) => event.target.openTooltip(),
+                          blur: (event) => event.target.closeTooltip(),
+                          click: selectReport,
+                          keydown: (event) => {
+                            if (event.originalEvent.key === 'Enter' || event.originalEvent.key === ' ') {
+                              event.originalEvent.preventDefault()
+                              selectReport()
+                            }
                           }
                         }}
                       >
+                        <Tooltip direction="top" offset={[0, -36]} className="map-marker-tooltip">
+                          <span>{t(lang, 'pages.accessibilityMap.reportMarkerTooltip')}</span>
+                          <span>{t(lang, 'pages.accessibilityMap.markerClickHint')}</span>
+                        </Tooltip>
                       </Marker>
                     )
                   })}
@@ -1127,24 +1154,40 @@ function AccessibilityMap() {
                     const pos = normalizeCoordinates(resource.coordinates)
                     if (!pos) return null
                     const isSelected = selectedMapResource?._id === resource._id
+                    const selectResource = () => {
+                      markerClickedRef.current = true
+                      setSelectedMapResource(resource)
+                      setSelectedReportMarker(null)
+                      setSearchQuery(pickI18n(resource.titleI18n, lang, resource.title))
+                      setIsTyping(false)
+                      setIsPanelOpen(true)
+                    }
                     return (
                       <Marker
                         key={`res-${resource._id}`}
                         position={pos}
                         icon={isSelected ? resourceIconSelected : resourceIcon}
+                        keyboard
+                        title={pickI18n(resource.titleI18n, lang, resource.title)}
                         eventHandlers={{
-                          click: () => {
-                            markerClickedRef.current = true
-                            setSelectedMapResource(resource)
-                            setSelectedReportMarker(null)
-                            // show resource title in search bar but don't trigger suggestions
-                            setSearchQuery(pickI18n(resource.titleI18n, lang, resource.title))
-                            setIsTyping(false)
-                            setIsPanelOpen(true)
+                          focus: (event) => event.target.openTooltip(),
+                          blur: (event) => event.target.closeTooltip(),
+                          click: selectResource,
+                          keydown: (event) => {
+                            if (event.originalEvent.key === 'Enter' || event.originalEvent.key === ' ') {
+                              event.originalEvent.preventDefault()
+                              selectResource()
+                            }
                           }
                         }}
                         ref={resource._id === selectedResourceId ? selectedMarkerRef : null}
                       >
+                        <Tooltip direction="top" offset={[0, -36]} className="map-marker-tooltip">
+                          <span>{tFormat(lang, 'pages.accessibilityMap.resourceMarkerTooltip', {
+                            name: pickI18n(resource.titleI18n, lang, resource.title),
+                          })}</span>
+                          <span>{t(lang, 'pages.accessibilityMap.markerClickHint')}</span>
+                        </Tooltip>
                       </Marker>
                     )
                   })}
