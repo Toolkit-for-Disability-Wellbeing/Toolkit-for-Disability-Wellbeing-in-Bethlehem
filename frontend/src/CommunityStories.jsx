@@ -53,6 +53,16 @@ function CommunityStories() {
         </p>
       </header>
 
+      <section
+        className="cta-band stories-submit-cta"
+        aria-label={t(lang, 'pages.communityStories.submitCtaAriaLabel')}
+      >
+        <p className="cta-band-text">{t(lang, 'pages.communityStories.submitCtaDescription')}</p>
+        <Link to="/submit?type=communityStory" className="cta-band-button">
+          {t(lang, 'pages.communityStories.submitCtaButton')}
+        </Link>
+      </section>
+
       {loading ? (
         <p>{t(lang, 'pages.communityStories.loading')}</p>
       ) : stories.length === 0 ? (
@@ -107,4 +117,3 @@ function CommunityStories() {
 }
 
 export default CommunityStories
-

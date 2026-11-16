@@ -1,5 +1,5 @@
 import { useRef, useState } from 'react'
-import { Link } from 'react-router-dom'
+import { Link, useSearchParams } from 'react-router-dom'
 import { sanity } from './sanityClient'
 import Breadcrumb from './Breadcrumb'
 import { useLanguage } from './languageContext'
@@ -8,7 +8,20 @@ import './SubmitForm.css'
 
 function SubmitForm() {
   const lang = useLanguage()
-  const [type, setType] = useState('resource')
+  const [searchParams] = useSearchParams()
+  const [type, setType] = useState(
+    searchParams.get('type') === 'communityStory' ? 'communityStory' : 'resource'
+  )
+  const fieldLabel = (labelKey, required = false) => (
+    <span>
+      {t(lang, labelKey)}{' '}
+      {required && (
+        <span className="submit-field-requirement">
+          {t(lang, 'pages.submitForm.requiredIndicator')}
+        </span>
+      )}
+    </span>
+  )
 
   const initialFormState = {
     submitterName: '',
@@ -225,7 +238,7 @@ function SubmitForm() {
             <legend>{t(lang, 'pages.submitForm.contactLegend')}</legend>
 
             <label className="submit-label" htmlFor="submitterName">
-              {t(lang, 'pages.submitForm.nameLabel')}
+                  {fieldLabel('pages.submitForm.nameLabel')}
               <input
                 id="submitterName"
                 type="text"
@@ -236,7 +249,7 @@ function SubmitForm() {
             </label>
 
             <label className="submit-label" htmlFor="submitterEmail">
-              {t(lang, 'pages.submitForm.emailLabel')}
+              {fieldLabel('pages.submitForm.emailLabel')}
               <input
                 id="submitterEmail"
                 type="email"
@@ -252,7 +265,7 @@ function SubmitForm() {
               <legend>{t(lang, 'pages.submitForm.resourceLegend')}</legend>
 
               <label className="submit-label" htmlFor="resourceTitle">
-                {t(lang, 'pages.submitForm.resourceNameLabel')}
+                {fieldLabel('pages.submitForm.resourceNameLabel', true)}
                 <input
                   id="resourceTitle"
                   type="text"
@@ -266,7 +279,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceUrl">
-                {t(lang, 'pages.submitForm.websiteLinkLabel')}
+                {fieldLabel('pages.submitForm.websiteLinkLabel')}
                 <input
                   id="resourceUrl"
                   type="url"
@@ -277,7 +290,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceCategory">
-                {t(lang, 'pages.submitForm.categoryLabel')}
+                {fieldLabel('pages.submitForm.categoryLabel', true)}
                 <select
                   ref={resourceCategoryRef}
                   id="resourceCategory"
@@ -314,7 +327,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceDescription">
-                {t(lang, 'pages.submitForm.descriptionLabel')}
+                {fieldLabel('pages.submitForm.descriptionLabel', true)}
                 <textarea
                   id="resourceDescription"
                   name="resourceDescription"
@@ -328,7 +341,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceContactEmail">
-                {t(lang, 'pages.submitForm.resourceContactEmailLabel')}
+                {fieldLabel('pages.submitForm.resourceContactEmailLabel')}
                 <input
                   id="resourceContactEmail"
                   type="email"
@@ -339,7 +352,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceContactPhone">
-                {t(lang, 'pages.submitForm.resourceContactPhoneLabel')}
+                {fieldLabel('pages.submitForm.resourceContactPhoneLabel')}
                 <input
                   id="resourceContactPhone"
                   type="tel"
@@ -350,7 +363,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceAddressStreet">
-                {t(lang, 'pages.submitForm.streetAddressLabel')}
+                {fieldLabel('pages.submitForm.streetAddressLabel')}
                 <input
                   id="resourceAddressStreet"
                   type="text"
@@ -361,7 +374,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceAddressCity">
-                {t(lang, 'pages.submitForm.cityLabel')}
+                {fieldLabel('pages.submitForm.cityLabel')}
                 <input
                   id="resourceAddressCity"
                   type="text"
@@ -372,7 +385,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceAddressState">
-                {t(lang, 'pages.submitForm.stateLabel')}
+                {fieldLabel('pages.submitForm.stateLabel')}
                 <input
                   id="resourceAddressState"
                   type="text"
@@ -383,7 +396,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="resourceAddressZipCode">
-                {t(lang, 'pages.submitForm.zipCodeLabel')}
+                {fieldLabel('pages.submitForm.zipCodeLabel')}
                 <input
                   id="resourceAddressZipCode"
                   type="text"
@@ -400,7 +413,7 @@ function SubmitForm() {
               <legend>{t(lang, 'pages.submitForm.storyLegend')}</legend>
 
               <label className="submit-label" htmlFor="storyTitle">
-                {t(lang, 'pages.submitForm.storyTitleLabel')}
+                {fieldLabel('pages.submitForm.storyTitleLabel', true)}
                 <input
                   id="storyTitle"
                   type="text"
@@ -414,7 +427,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="storyPersonName">
-                {t(lang, 'pages.submitForm.storyPersonNameLabel')}
+                {fieldLabel('pages.submitForm.storyPersonNameLabel')}
                 <input
                   id="storyPersonName"
                   type="text"
@@ -425,7 +438,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="storyLocation">
-                {t(lang, 'pages.submitForm.storyLocationLabel')}
+                {fieldLabel('pages.submitForm.storyLocationLabel')}
                 <input
                   id="storyLocation"
                   type="text"
@@ -436,7 +449,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="storySummary">
-                {t(lang, 'pages.submitForm.storySummaryLabel')}
+                {fieldLabel('pages.submitForm.storySummaryLabel')}
                 <textarea
                   id="storySummary"
                   name="storySummary"
@@ -447,7 +460,7 @@ function SubmitForm() {
               </label>
 
               <label className="submit-label" htmlFor="storyBody">
-                {t(lang, 'pages.submitForm.storyBodyLabel')}
+                {fieldLabel('pages.submitForm.storyBodyLabel', true)}
                 <textarea
                   id="storyBody"
                   name="storyBody"
@@ -468,7 +481,21 @@ function SubmitForm() {
 
           {status === 'success' && (
             <p className="submit-message success" role="status" aria-live="polite">
-              {t(lang, 'pages.submitForm.successMessage')}
+              {type === 'communityStory' ? (
+                <>
+                  {t(lang, 'pages.submitForm.storySuccessMessage')}{' '}
+                  <Link to="/community-stories">
+                    {t(lang, 'pages.submitForm.storySuccessLinkLabel')}
+                  </Link>
+                </>
+              ) : (
+                <>
+                  {t(lang, 'pages.submitForm.resourceSuccessMessage')}{' '}
+                  <Link to="/resources">
+                    {t(lang, 'pages.submitForm.resourceSuccessLinkLabel')}
+                  </Link>
+                </>
+              )}
             </p>
           )}
 
